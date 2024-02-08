@@ -1,0 +1,24 @@
+// api.proto
+
+syntax = "proto3";
+
+package myproject;
+
+// Nachrichten (Datenstrukturen) für die Kommunikation
+message RequestData {
+  string id = 1;
+  string data = 2;
+}
+
+message ResponseData {
+  string result = 1;
+  // Weitere Felder je nach Bedarf
+}
+
+// Definition des gRPC-Dienstes
+service APIService {
+  // Beispiel für einen gRPC-Aufruf, um Daten zu verarbeiten
+  rpc ProcessData(RequestData) returns (ResponseData);
+  
+  // Weitere gRPC-Aufrufe und Dienste je nach Bedarf
+}
