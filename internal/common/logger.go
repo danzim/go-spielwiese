@@ -1,5 +1,3 @@
-// internal/common/logger.go
-
 package common
 
 import (

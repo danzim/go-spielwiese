@@ -1,0 +1,14 @@
+server:
+  port: 8080
+  host: 0.0.0.0
+
+redis:
+  address: "localhost:6379"
+  password: "changeme"
+
+grpc:
+  backend_service_address: "backend-service:50051"
+
+logging:
+  level: "info"
+  format: "json"
