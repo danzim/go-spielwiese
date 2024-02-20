@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/danzim/go-spielwiese/v2/api/handlers"
 	"github.com/danzim/go-spielwiese/v2/internal/schemas"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v3"
@@ -18,6 +20,13 @@ func main() {
 		log.Fatalf("Error loading config: %v", err)
 	}
 
+	redisHandler, err := handlers.NewRedisHandler(config.Redis.Address, config.Redis.Password)
+	if err != nil {
+		log.Fatalf("Error creating Redis handler: %v", err)
+	}
+
+	initializeClusters(*redisHandler, *config)
+
 	r := gin.Default()
 
 	r.GET("/ping", func(c *gin.Context) {
@@ -27,7 +36,8 @@ func main() {
 	})
 
 	// ClusterService Endpunkte
-	r.GET("/clusters", listClusters)
+	clusterHandler := handlers.NewClusterHandler(redisHandler)
+	r.GET("/clusters", clusterHandler.ListClusters)
 	r.GET("/clusters/:cluster", readCluster)
 
 	// ProjectService Endpunkte
@@ -61,9 +71,29 @@ func loadConfig() (*schemas.APIconfig, error) {
 	return config, nil
 }
 
-// Funktionen für die Endpunkte (Handler-Funktionen)
-func listClusters(c *gin.Context) {
-	// Hier kannst du die Logik für die "listClusters"-Funktion implementieren
+func initializeClusters(rh handlers.RedisHandler, config schemas.APIconfig) {
+
+	clusters := schemas.ClusterList{
+		Kind:       "ClusterList",
+		APIVersion: "v1",
+		Items:      []schemas.Cluster{},
+	}
+
+	for _, cl := range config.Clusters {
+		cluster := schemas.Cluster{
+			Kind:       "Cluster",
+			APIVersion: "v1",
+			Metadata: struct {
+				Name string "json:\"name\""
+			}{
+				Name: cl,
+			},
+		}
+
+		clusters.Items = append(clusters.Items, cluster)
+	}
+
+	rh.SetData("clusters", clusters, time.Minute)
 }
 
 func readCluster(c *gin.Context) {

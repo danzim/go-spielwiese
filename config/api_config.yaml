@@ -3,7 +3,7 @@ server:
   host: 0.0.0.0
 
 redis:
-  address: "localhost:6379"
+  address: "redis-7:6379"
   password: "changeme"
 
 grpc:
@@ -12,3 +12,7 @@ grpc:
 logging:
   level: "info"
   format: "json"
+
+clusters:
+ - "lan-lab-001"
+ - "lan-lab-002"

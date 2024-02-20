@@ -73,4 +73,6 @@ type APIconfig struct {
 		Level  string `yaml:"level"`
 		Format string `yaml:"format"`
 	} `yaml:"logging"`
+
+	Clusters []string `yaml:"clusters"`
 }
